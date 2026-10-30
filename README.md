@@ -4,6 +4,9 @@
 
 ---
 
+Link: https://stock-market-app-smichurski.streamlit.app
+
+---
 ## 🚀 About the Project
 This project was created for modern investors looking for tools based on hard data and proven quantitative strategies. The application combines clean software architecture with advanced visualization of real-time market data fetched from Yahoo Finance.
 
