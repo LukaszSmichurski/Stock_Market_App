@@ -1,6 +1,7 @@
 import streamlit as st
 import plotly.express as px
 import datetime as dt
+
 from config import POPULAR_INDICES, GEM_ORIGINAL, GEM_ZAWOD_INWESTOR
 from logic import getDate, fetch_data
 
@@ -8,36 +9,35 @@ WSZYSTKIE_INSTRUMENTY = {**POPULAR_INDICES, **GEM_ORIGINAL, **GEM_ZAWOD_INWESTOR
 
 st.set_page_config(
     page_title="Fintech Dashboard",
-    page_icon="📈",
     layout="wide"
 )
 
 with st.sidebar:
-    st.title("Porównywarka Indeksów")
+    st.title("Index Comparison")
 
     tryb = st.radio(
-        "Tryb analizy:",
-        ["🔍 Własny Portfel", "🚀 Strategia GEM (Momentum)"],
+        "Analysis mode:",
+        ["Instruments of your choice", "GEM strategy"],
         horizontal=True
     )
 
     st.markdown("---")
 
-    if tryb == "🔍 Własny Portfel":
+    if tryb == "Instruments of your choice":
         wybrane_nazwy = st.multiselect(
-            "Wybierz instrumenty do porównania:",
+            "Select instruments for comparison:",
             options=list(POPULAR_INDICES.keys())
         )
     else:
-        st.info("💡 Tryb GEM ładuje odpowiednie aktywa, aby sprawdzić, co wygrywa w strategii Dual Momentum.")
-        wersja_gem = st.selectbox("Wersja strategii:", ["Oryginalna (USA)", "Europejska (UCITS - XTB)"])
+        st.info("The GEM mode loads the relevant assets to determine what is winning under the Dual Momentum strategy.")
+        wersja_gem = st.selectbox("Strategy version:", ["Original (USA)", "European (UCITS - XTB)"])
 
-        if wersja_gem == "Oryginalna (USA)":
+        if wersja_gem == "Original (USA)":
             wybrane_nazwy = list(GEM_ORIGINAL.keys())
         else:
             wybrane_nazwy = list(GEM_ZAWOD_INWESTOR.keys())
 
-        st.multiselect("Instrumenty badane w tej strategii:", wybrane_nazwy, default=wybrane_nazwy, disabled=True)
+        st.multiselect("Instruments examined in this strategy:", wybrane_nazwy, default=wybrane_nazwy, disabled=True)
 
     period = st.selectbox("Period", ("1 Month", "6 Months", "1 Year", "5 Years"))
 
@@ -46,14 +46,14 @@ with st.sidebar:
 
     st.markdown("---")
 
-    oblicz_klikniety = st.button("Oblicz stopy zwrotu", type="primary", use_container_width=True)
+    oblicz_klikniety = st.button("Calculate the rates of return", type="primary", use_container_width=True)
 
 
 if oblicz_klikniety:
     if not wybrane_nazwy:
-        st.warning("Wybierz chociaż jeden indeks z listy.")
+        st.warning("Select at least one instrument")
     else:
-        with st.spinner("Pobieranie danych z giełdy..."):
+        with st.spinner("Fetching data from the exchange..."):
 
             wybrane_tickery = [WSZYSTKIE_INSTRUMENTY[n] for n in wybrane_nazwy]
             ceny = fetch_data(wybrane_tickery, start_date, end_date)
@@ -78,28 +78,29 @@ if oblicz_klikniety:
 
                 cols[i].metric(nazwa, f"{round(aktualna_cena, 2)}", f"{round(wynik_procentowy, 2)} %")
 else:
-    st.title("📊 Analityczny Dashboard Giełdowy")
-    st.markdown("Witaj w narzędziu do analizy stóp zwrotu instrumentów finansowych.")
+    st.title("Stock Market Analytics Dashboard")
+    st.markdown("Welcome to the financial instrument return analysis tool.")
 
     st.info(
-        "👈 Skonfiguruj parametry w **panelu po lewej stronie**,"
-        " a następnie kliknij czerwony przycisk **Oblicz stopy zwrotu**,"
-        " aby wygenerować wykres.")
+        "Configure the parameters in the **sidebar**"
+        " and then click the **Calculate the rates of return** button"
+        " to generate a chart."
+    )
 
     st.markdown("---")
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown("### 🔍 Co potrafi aplikacja?")
+        st.markdown("### What can the application do?")
         st.markdown(
-            "- Porównywanie wielu indeksów i ETF-ów jednocześnie\n"
-            "- Automatyczna normalizacja cen do bazy 100\n"
-            "- Generowanie interaktywnych wykresów w czasie rzeczywistym"
+            "- Compare multiple indices and ETFs simultaneously\n"
+            "- Automatically normalize prices to a base of 100\n"
+            "- Generate interactive charts in real time"
         )
 st.markdown("---")
 st.markdown(
     "<div style='text-align: center; color: grey;'>"
-    "Zaprojektowane i zakodowane przez <a href='https://smichurski.pl' target='_blank'>Łukasza Śmichurskiego</a> | "
-    "Wersja 1.0"
+    "Designed and developed by <a href='https://smichurski.pl' target='_blank'>Łukasz Śmichurski</a> | "
+    "Version 1.0"
     "</div>",
     unsafe_allow_html=True
 )
